@@ -7,6 +7,15 @@ import json
 import sys
 import utils
 
+"""
+For efficency, we downsample the images by 4. This speeds up SIFT and reduces the
+number of SIFT features to match, as putative matching is a bottleneck in this process.
+Feel free to change the downsample factor as needed. A smaller downsample factor will result
+in a slower, more accurate segmentation. A larger downsample factor will speed things up, but
+could reduce accuracy.
+This factor was chosen for segmentation of the 1930 census. Depending on the resolution of
+your images, this factor may or may not work for you.
+"""
 
 DOWNSAMPLE_FACTOR = 4
 
