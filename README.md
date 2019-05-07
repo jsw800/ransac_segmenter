@@ -6,6 +6,8 @@ a document formatted in exactly the same way as the samples to be segmented.
 RANSAC will generate a homography that will transform the template points onto each
 sample image using a projective transformation.
 
+We provide a template image and points for the 1930 census in the data/ directory.
+
 # Details
 
 ## SIFT

@@ -76,6 +76,9 @@ class RANSAC_segmenter:
             return None
         # invert because h is sample to template, we want template to sample
         h = best
+        # TODO: possible although very unlikely infinite recursion
+        # Possible fix: compute homography from template to sample and then we don't
+        # have to invert and this retry recursion doesn't need to happen.
         try:
             h = np.linalg.inv(h)
         except np.linalg.LinAlgError as e:
@@ -92,8 +95,7 @@ class RANSAC_segmenter:
         return pts[:2].astype(np.int32)
 
 
-
-
+# main method will segment an entire folder of images.
 if __name__ == '__main__':
     template_img = sys.argv[1]
     template_points = sys.argv[2]
