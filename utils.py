@@ -23,6 +23,7 @@ def find_homography(p1, p2):
                   [p2[3][1]]])
     try:
         h = np.linalg.solve(A, y)
+    # this exception happens only when 3 points in either p1 or p2 are colinear
     except:
         return None
     retval = np.zeros([3,3], dtype=np.float64)
@@ -42,9 +43,12 @@ given SIFT keypoints and descriptors for each image, return pairs of points that
 likely the same point in the two images
 """
 def get_putative_matches(kp1, des1, kp2, des2):
+    # use cv2 to calculate the matches
     matcher = cv2.BFMatcher()
     matches = matcher.knnMatch(des1, des2, k=2)
     retval = []
+    # prune out matches that are not confident enough,
+    # and put matches into tuples of ((x1, y1), (x2, y2))
     for i, pair in enumerate(matches):
         if float(pair[0].distance) / float(pair[1].distance) > 0.75:
             continue
