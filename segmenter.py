@@ -107,11 +107,11 @@ if __name__ == '__main__':
     template_points = sys.argv[2]
     sample_dir = sys.argv[3]
     out_dir = sys.argv[4]
+    segmenter = RANSAC_segmenter(template_img, template_points)
     images = [join(sample_dir, flnm) for flnm in os.listdir(sample_dir) if 'jpg' in flnm]
     for flnm in images:
         imgnum = flnm.split('/')[-1].split('.')[0]
         sample_image = cv2.imread(flnm)
-        segmenter = RANSAC_segmenter(template_img, template_points)
         points = segmenter.segment(sample_image)
         if points is None:
             print('could not segment ' + flnm)
