@@ -92,6 +92,9 @@ class RANSAC_segmenter:
             pts[:, i] = np.matmul(h, pts[:, i])
             pts[:, i] /= pts[:, i][2]
         pts *= DOWNSAMPLE_FACTOR
+        # if we get any negative values on a point, the segmentation probably failed.
+        if np.min(pts) < 0:
+            return None
         return pts[:2].astype(np.int32)
 
 
