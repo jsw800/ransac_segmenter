@@ -43,3 +43,8 @@ points on the template image. In order to transfer the labels from the template 
 the sample image, we invert the RANSAC homography, and multiply this inverse by each point
 from the template labels (normalizing them in homogeneous coordinates). The points we get out
 should correspond to the table corner points on the sample image, and we are done.
+
+# Usage
+
+segmenter.py is set up to segment a directory of images at a time. To use this script,
+run `python segmenter.py [template_img_path] [template_points_path] [sample_directory] [out_directory]`.

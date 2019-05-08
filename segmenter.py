@@ -100,6 +100,9 @@ class RANSAC_segmenter:
 
 # main method will segment an entire folder of images.
 if __name__ == '__main__':
+    if len(sys.argv) != 5:
+        print('usage: python segmenter.py [template_img_path] [template_points_path] [sample_directory] [out_directory]')
+        exit()
     template_img = sys.argv[1]
     template_points = sys.argv[2]
     sample_dir = sys.argv[3]
