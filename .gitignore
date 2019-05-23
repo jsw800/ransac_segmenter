@@ -1,1 +1,7 @@
 *.pyc
+*.json
+*.jpg
+out/
+.git/
+.idea/
+__pycache__/

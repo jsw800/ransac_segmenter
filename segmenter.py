@@ -5,7 +5,10 @@ import os
 import random
 import json
 import sys
+
+import range_calculator
 import utils
+
 
 """
 For efficency, we downsample the images by 4. This speeds up SIFT and reduces the
@@ -119,7 +122,8 @@ if __name__ == '__main__':
             with open(join(out_dir, imgnum + '.json'), 'w+') as f:
                 f.write('{}')
             continue
-        out = [[int(points[:, i][0]), int(points[:, i][1])] for i in range(points.shape[1])]
+        points = range_calculator.convert_points_into_ranges(points)
+        out = [[int(points[i][0]), int(points[i][1]), int(points[i][2]), int(points[i][3])] for i in range(len(points))]
         out = {'corners': out}
         with open(join(out_dir, imgnum + '.json'), 'w+') as f:
             print('segmented ' + flnm)
