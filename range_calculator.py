@@ -7,7 +7,7 @@ x = 0
 y = 1
 
 
-def sortByX(array):
+def sortByX1(array):
     less = []
     equal = []
     greater = []
@@ -16,13 +16,13 @@ def sortByX(array):
         pivot = array[0][x]
 
         for element in array:
-            if element[x] - 30 < pivot < element[x] + 30:
+            if element[x] - 20 < pivot < element[x] + 20:
                 equal.append(element)
             elif element[x] < pivot:
                 less.append(element)
             elif element[x] > pivot:
                 greater.append(element)
-        return sortByX(less) + equal + sortByX(greater)  # Just use the + operator to join lists
+        return sortByX1(less) + equal + sortByX1(greater)  # Just use the + operator to join lists
     else:
         return array
 
@@ -67,35 +67,36 @@ def transform_points(corners, rotation_matrix, pivot):
     return corners
 
 
+def r_transform_points(corners, rotation_matrix, pivot):
+    i = 0
+    while i < len(corners):
+        temp_point = [[corners[i][x]-pivot[x]], [corners[i][y]-pivot[y]], [1]]
+        new_point = numpy.matmul(rotation_matrix, temp_point)
+        corners[i] = [int(round(new_point[0][0]+pivot[x])),
+                      int(round(new_point[1][0]+pivot[y]))]
+        i = i+1
+    return corners
+
+
 def deskew_points(corners, angle):
     ccw_rotation_matrix = [[math.cos(angle), math.sin(-angle), 0],
                            [math.sin(angle), math.cos(angle), 0],
                            [0, 0, 1]]
-    cw_rotation_matrix = [[math.cos(angle), math.sin(angle), 0],
-                          [math.sin(-angle), math.cos(angle), 0],
-                          [0, 0, 1]]
     pivot = corners[0]
-    if angle < 0:
+    if angle > 0 or angle < 0:
         corners = transform_points(corners, ccw_rotation_matrix, pivot)
-    elif angle > 0:
-        corners = transform_points(corners, cw_rotation_matrix, pivot)
     return corners
 
 
 def reskew_points(columns, angle):
-    ccw_rotation_matrix = [[math.cos(angle), math.sin(-angle), 0],
-                           [math.sin(angle), math.cos(angle), 0],
-                           [0, 0, 1]]
     cw_rotation_matrix = [[math.cos(angle), math.sin(angle), 0],
                           [math.sin(-angle), math.cos(angle), 0],
                           [0, 0, 1]]
     pivot = columns[0][0]
-    if angle > 0:
+    if angle > 0 or angle < 0:
+        # columns = r_transform_points(columns, cw_rotation_matrix, pivot)
         for i in range(len(columns)):
-            columns[i] = transform_points(columns[i], ccw_rotation_matrix, pivot)
-    elif angle < 0:
-        for i in range(len(columns)):
-            columns[i] = transform_points(columns[i], cw_rotation_matrix, pivot)
+            columns[i] = r_transform_points(columns[i], cw_rotation_matrix, pivot)
     return columns
 
 
@@ -103,14 +104,12 @@ def find_column_lines(deskewed_corners):
     array1 = []
     i = 0
     while i < len(deskewed_corners)-1:
-        pivot = deskewed_corners[i]
-        array2 = [pivot]
-        for point in deskewed_corners[i+1:]:
-            i = i + 1
-            if -50 < point[x] - pivot[x] < 50:
-                array2.append([point[x], point[y]])
-            else:
-                break
+        array2 = []
+        j = 0
+        for j in range(51):
+            array2.append(deskewed_corners[i+j])
+            j = j + 1
+        i = i + j
         array1.append(array2)
     return array1
 
@@ -120,7 +119,9 @@ def create_ranges(columns):
     i = 0
     while i < len(columns)-2:
         j = 0
-        while j < len(columns[i])-2 and j < len(columns[i+1])-2:
+        if len(columns[i]) != len(columns[i+1]):
+            stop = "stop"
+        while j < len(columns[i])-1 and j < len(columns[i+1])-1:
             cell_range = [round(min(columns[i][j][x], columns[i][j+1][x])),
                           round(max(columns[i+1][j][x], columns[i+1][j+1][x])),
                           round(min(columns[i][j][y], columns[i+1][j][y])),
@@ -140,17 +141,17 @@ def flatten_matrix(matrix):
 
 def convert_points_into_ranges(unsorted_points):
     unsorted_points = flatten_matrix(unsorted_points)
-    half_sorted_points = sorted(unsorted_points, key=lambda a: a[y])
-    sorted_points = sortByX(half_sorted_points)
+    # half_sorted_points = sorted(unsorted_points, key=lambda a: a[y])
+    # sorted_points = sortByX1(half_sorted_points)
 
-    angle = find_angle(sorted_points)
-    if -0.05235988 > angle or angle > 0.05235988:
-        sorted_points = deskew_points(sorted_points, angle)
-    columns = find_column_lines(sorted_points)
-    if -0.05235988 > angle or angle > 0.05235988:
-        columns = reskew_points(columns, angle)
+    angle = find_angle(unsorted_points)
+    # if -0.05235988 > angle or angle > 0.05235988:
+    unsorted_points = deskew_points(unsorted_points, angle)
+    # sorted_points = sorted(unsorted_points, key=lambda a: a[x])
+    columns = find_column_lines(unsorted_points)
+    # if -0.05235988 > angle or angle > 0.05235988:
+    columns = reskew_points(columns, angle)
     ranges = create_ranges(columns)
-
     return ranges
 
 
